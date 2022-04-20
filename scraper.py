@@ -1,6 +1,7 @@
 
 #%%
 
+from typing import Container
 import selenium
 from selenium.webdriver import Chrome
 from selenium import webdriver
@@ -10,6 +11,19 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+
+import re
+import uuid
+from uuid import UUID
+
+import os
+import json
+
+
+
+
+
+
 
 
 
@@ -56,13 +70,114 @@ class scraper():
             print("no log-in pop up")
 
     def finding_containers(self, xpath:str= '//table[@class= "tableList"]'):
-        return self.driver.find_element(By.XPATH,xpath)
+        global container
+        container = self.driver.find_element(By.XPATH,xpath)
+        return container
+
+    def list_books_urls(self, xpath:str= '//tr'):
+        global list_urls
+
+        list_books = container.find_elements(By.XPATH, xpath)
+        print(f'the number of books url found are {len(list_books)}')
+
+        list_urls = []
+            
+        for books in list_books:
+            list_urls.append(books.find_element(By.TAG_NAME, 'a').get_attribute('href'))
+
+        #print(list_urls)
+
+        '''
+        try:
+            WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.XPATH,xpath)))
+            list_books = self.containers.find_elements(By.XPATH, '//tr')
+            len(list_books)
+
+            
+            
+            for books in list_books:
+                list_urls.append(books.find_element(By.TAG_NAME, 'a').get_attribute('href'))
+
+        except TimeoutException:
+            print('cannot find the list urls')
+
+        '''
+    
+    
+    def books_info(self):
+
+        global info_dict
+
+
+        info_dict = {
+                'urls' :[],
+                'unique ID' :[],
+                'book title' :[],
+                'author name' :[],
+                'rating' :[],
+                'book description' :[],
+                'book_cover_links' :[],
+                'v4 UUID' :[]
+                }
+
+
+
+        for urls in list_urls[0:20]:
+
+            self.driver.get(urls)
+            info_dict['urls'].append(urls)
+
+
+            ur = re.findall('\d+', urls)
+            info_dict['unique ID'].append(ur[0])
             
 
+            book_title = bot.driver.find_element(By.XPATH, '//*[@id="bookTitle"]')
+            info_dict['book title'].append(book_title.text)
 
-            
+            author_name = bot.driver.find_element(By.XPATH, '//*[@id="bookAuthors"]')
+            info_dict['author name'].append(author_name.text)
 
-        
+            rating = bot.driver.find_element(By.XPATH, '//*[@id="bookMeta"]/span[2]')
+            info_dict['rating'].append(rating.text)
+
+            book_description = bot.driver.find_element(By.XPATH, '//*[@id="descriptionContainer"]')
+            info_dict['book description'].append(book_description.text)
+
+
+
+            bot.driver.get(urls)
+            image = bot.driver.find_element(By.XPATH, '//*[@id="imagecol"]/div[1]/div[1]/a')
+            #print(f'image is {image}')
+            imag_dic = image.find_element(By.TAG_NAME, 'img').get_attribute('src')
+            #print( f'imag dic {imag_dic}')
+            #print(image)
+            #img= image.get_attribute('src')
+            info_dict['book_cover_links'].append(imag_dic)
+
+
+
+            uu_id = uuid.uuid4()
+            uuid_str = str(uu_id)
+            info_dict['v4 UUID'].append(uuid_str)
+
+        #print(info_dict)
+
+    def save_injson(self):
+
+        folder = r'raw_data'
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+        with open("/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.json", "w+") as f:
+            json.dump(info_dict, f)
+
+    def saving_images(self):
+
+        folder = r'/home/pramika/Documents/Aicore/data_collection_project/raw_data/images'
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
             
 
 if __name__ == '__main__':
@@ -72,7 +187,9 @@ if __name__ == '__main__':
     bot.click_search_button()
     bot.close_login_popup()
     bot.finding_containers()
-    
+    bot.list_books_urls()
+    bot.books_info()
+    bot.save_injson()
 
 
 
