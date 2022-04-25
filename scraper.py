@@ -1,6 +1,7 @@
 
 #%%
 
+from http.cookies import BaseCookie
 from typing import Container
 import selenium
 from selenium.webdriver import Chrome
@@ -19,6 +20,7 @@ from uuid import UUID
 import os
 import json
 
+import urllib.request
 
 
 
@@ -30,7 +32,8 @@ import json
 class scraper():
 
 
-    def __init__(self, url: str='https://www.goodreads.com/'):
+    def __init__(self,book, url: str='https://www.goodreads.com/'):
+        self.book = book 
         self.driver = Chrome()
         self.driver.get(url)
 
@@ -132,22 +135,22 @@ class scraper():
             info_dict['unique ID'].append(ur[0])
             
 
-            book_title = bot.driver.find_element(By.XPATH, '//*[@id="bookTitle"]')
+            book_title = self.driver.find_element(By.XPATH, '//*[@id="bookTitle"]')
             info_dict['book title'].append(book_title.text)
 
-            author_name = bot.driver.find_element(By.XPATH, '//*[@id="bookAuthors"]')
+            author_name = self.driver.find_element(By.XPATH, '//*[@id="bookAuthors"]')
             info_dict['author name'].append(author_name.text)
 
-            rating = bot.driver.find_element(By.XPATH, '//*[@id="bookMeta"]/span[2]')
+            rating = self.driver.find_element(By.XPATH, '//*[@id="bookMeta"]/span[2]')
             info_dict['rating'].append(rating.text)
 
-            book_description = bot.driver.find_element(By.XPATH, '//*[@id="descriptionContainer"]')
+            book_description = self.driver.find_element(By.XPATH, '//*[@id="descriptionContainer"]')
             info_dict['book description'].append(book_description.text)
 
 
 
-            bot.driver.get(urls)
-            image = bot.driver.find_element(By.XPATH, '//*[@id="imagecol"]/div[1]/div[1]/a')
+            #self.driver.get(urls)
+            image = self.driver.find_element(By.XPATH, '//*[@id="imagecol"]/div[1]/div[1]/a')
             #print(f'image is {image}')
             imag_dic = image.find_element(By.TAG_NAME, 'img').get_attribute('src')
             #print( f'imag dic {imag_dic}')
@@ -172,16 +175,32 @@ class scraper():
         with open("/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.json", "w+") as f:
             json.dump(info_dict, f)
 
+    '''
     def saving_images(self):
 
         folder = r'/home/pramika/Documents/Aicore/data_collection_project/raw_data/images'
         if not os.path.exists(folder):
             os.makedirs(folder)
 
+    '''
+
+    def download_images(self):
+        folder = r'/home/pramika/Documents/Aicore/data_collection_project/raw_data/images'
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+        book_links = info_dict["book_cover_links"]
+        #print(book_links)
+
+        for i,lst in enumerate(book_links):
+            self.driver.get(lst)
+            urllib.request.urlretrieve(lst,f'/home/pramika/Documents/Aicore/data_collection_project/raw_data/images/{bot.book}{i}.jpg')
+
+
             
 
 if __name__ == '__main__':
-    bot = scraper()
+    bot = scraper('stephen_king')
     bot.click_search_bar()
     bot.search()
     bot.click_search_button()
