@@ -37,6 +37,9 @@ class scraper():
         self.driver = Chrome()
         self.driver.get(url)
 
+
+
+
     def click_search_bar(self, xpath: str = '//div[@class="auto_complete_field_wrapper"]'):
         try:
             WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.XPATH,xpath)))
@@ -47,6 +50,8 @@ class scraper():
         except TimeoutException:
             print("couldn't find search bar")
             
+
+
     def search(self, xpath:str = '//input[@id="sitesearch_field"]'):
         try:
             WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.XPATH,xpath)))
@@ -55,6 +60,9 @@ class scraper():
         except TimeoutException:
             print("couldn't type the word in")
 
+
+
+
     def click_search_button(self, xpath:str= '//img[@title="Title / Author / ISBN"]'):
         try:
             WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.XPATH,xpath)))
@@ -62,6 +70,9 @@ class scraper():
 
         except TimeoutException:
             print("couldn't find the search button")
+
+
+
 
     def close_login_popup(self, xpath:str= '//button[@class= "gr-iconButton"]'):
         try:
@@ -72,10 +83,39 @@ class scraper():
         except TimeoutException:
             print("no log-in pop up")
 
+    
+    def find_author_details(self, xpath: str =''):
+
+        info_dict = {
+            'urls' :[],
+            'unique ID' :[],
+            'book title' :[],
+            'author name' :[],
+            'rating' :[],
+            'book description' :[],
+            'book_cover_links' :[],
+            'v4 UUID' :[]
+            }
+            
+        try:
+            WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.XPATH,xpath)))
+            self.driver.find_element(By.XPATH,xpath).click()
+
+            
+        except:
+
+
+
+
+
     def finding_containers(self, xpath:str= '//table[@class= "tableList"]'):
         global container
         container = self.driver.find_element(By.XPATH,xpath)
         return container
+
+
+
+
 
     def list_books_urls(self, xpath:str= '//tr'):
         global list_urls
@@ -105,23 +145,15 @@ class scraper():
             print('cannot find the list urls')
 
         '''
+
+
+
     
     
     def books_info(self):
 
         global info_dict
 
-
-        info_dict = {
-                'urls' :[],
-                'unique ID' :[],
-                'book title' :[],
-                'author name' :[],
-                'rating' :[],
-                'book description' :[],
-                'book_cover_links' :[],
-                'v4 UUID' :[]
-                }
 
 
 
@@ -149,14 +181,16 @@ class scraper():
 
 
 
-            #self.driver.get(urls)
             image = self.driver.find_element(By.XPATH, '//*[@id="imagecol"]/div[1]/div[1]/a')
-            #print(f'image is {image}')
             imag_dic = image.find_element(By.TAG_NAME, 'img').get_attribute('src')
+            info_dict['book_cover_links'].append(imag_dic)
+
+            
+            #self.driver.get(urls)
+            #print(f'image is {image}')
             #print( f'imag dic {imag_dic}')
             #print(image)
             #img= image.get_attribute('src')
-            info_dict['book_cover_links'].append(imag_dic)
 
 
 
@@ -164,7 +198,13 @@ class scraper():
             uuid_str = str(uu_id)
             info_dict['v4 UUID'].append(uuid_str)
 
+            return info_dict
+
         #print(info_dict)
+
+
+
+
 
     def save_injson(self):
 
@@ -174,6 +214,11 @@ class scraper():
 
         with open("/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.json", "w+") as f:
             json.dump(info_dict, f)
+
+
+
+
+
 
     '''
     def saving_images(self):
@@ -197,6 +242,9 @@ class scraper():
             urllib.request.urlretrieve(lst,f'/home/pramika/Documents/Aicore/data_collection_project/raw_data/images/{bot.book}{i}.jpg')
 
 
+
+
+
             
 
 if __name__ == '__main__':
@@ -209,6 +257,8 @@ if __name__ == '__main__':
     bot.list_books_urls()
     bot.books_info()
     bot.save_injson()
+    bot.download_images()
+
 
 
 
