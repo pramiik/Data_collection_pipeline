@@ -1,6 +1,7 @@
 
 #%%
 
+from ast import Break
 from http.cookies import BaseCookie
 from typing import Container
 import selenium
@@ -81,7 +82,7 @@ class scraper():
 
 
 
-    def click_search_button(self, xpath:str= '//img[@title="Title / Author / ISBN"]'):
+    def click_search_button(self, xpath:str= '//*[@id="headerSearchForm"]/a/img'): #'//img[@title="Title / Author / ISBN"]'
         """
         This function clicks the search button to start the searching.
 
@@ -195,7 +196,8 @@ class scraper():
             xpath (str): xpath of the links
         """
         global list_urls     
-        list_urls =[]
+        global list_books
+        global l
 
         global info_dict
         info_dict = {
@@ -210,32 +212,36 @@ class scraper():
             'v4 UUID' :[]
             }
 
-        list_books=[]
-        n=11
+        #list_books=[]
+        
 
         #ls = range(10)
-        while n>10:
-            list_books = container.find_elements(By.XPATH, xpath)
+        #while n>10:
+        list_books = container.find_elements(By.XPATH, xpath)
+
             #print(f'list of books is : {list_books}')
             #list_books.append(lis_bk)
 
-            n = len(list_books)
-            print(f'the number of books url found are {n}')
-            x=x+1
+        n = len(list_books)
+        print(f'the number of books url found are {n}')
+       # x=x+1
         
-            for books in list_books:
-                list_urls.append(books.find_element(By.TAG_NAME, 'a').get_attribute('href'))
+        for books in list_books:
+            list_urls.append(books.find_element(By.TAG_NAME, 'a').get_attribute('href'))
 
-            if n==20:
-                self.next_page()
-                x==True
-            else:
+        l=len(list_urls)
+
+        print(f'total number of books url found are {l}')
+
+        
+        
+            #if n==20:
+             #   self.next_page()
+              #  x==True
+               # list_books = None
+            #else:
                 #x==False
-                print('out of the while loop')
-
-
-        print(f'total number of books url found are {len(list_books)}')
-        
+             #   print('out of the while loop')
 
         #print(list_urls)
 
@@ -257,19 +263,33 @@ class scraper():
         
 
     def list_urls_other(self):
-        for n in range(10):
-            n=n+1
-            self.next_page()
+
+        global list_urls
+        period=0
+
+        list_urls =[]
+        while period<7:
+            
+            self.finding_containers()
             self.list_books_urls()
+            self.next_page()
+            if l>125:
+                #Break
+                print('out of the while loop')
+            else:
+                
+                print('contiues with while loop')
+            period+=1
 
+        
+        
 
+    def next_page(self,xpath:str='//div/a[@class="next_page"]'):
 
-
-    def next_page(self,xpath:str='/html/body/div[2]/div[3]/div[1]/div[2]/div[2]/div[3]/div/a[7]'):
-
-        self.driver.find_element(By.XPATH,xpath).click()
-
-
+        try:
+            self.driver.find_element(By.XPATH,xpath).click()
+        except:
+            print('no next page available')
 
 
     
@@ -289,7 +309,7 @@ class scraper():
 
 
 
-        for urls in list_urls[0:20]:
+        for urls in list_urls[0:l]:
 
             self.driver.get(urls)
             info_dict['urls'].append(urls)
@@ -317,9 +337,12 @@ class scraper():
             
 
 
-
-            image = self.driver.find_element(By.XPATH, '//*[@id="imagecol"]/div[1]/div[1]/a')
-            imag_dic = image.find_element(By.TAG_NAME, 'img').get_attribute('src')
+            try:
+                image = self.driver.find_element(By.XPATH, '//*[@id="imagecol"]/div[1]/div[1]/a')
+                imag_dic = image.find_element(By.TAG_NAME, 'img').get_attribute('src')
+            except:
+                print('no book cover found for this book')
+                imag_dic = 'no book cover'
             info_dict['book_cover_links'].append(imag_dic)
 
             
@@ -394,8 +417,11 @@ class scraper():
         #print(book_links)
 
         for i,lst in enumerate(book_links):
-            self.driver.get(lst)
-            urllib.request.urlretrieve(lst,f'/home/pramika/Documents/Aicore/data_collection_project/raw_data/images/{bot.book}{i}.jpg')
+            try:
+                self.driver.get(lst)
+                urllib.request.urlretrieve(lst,f'/home/pramika/Documents/Aicore/data_collection_project/raw_data/images/{bot.book}{i}.jpg')
+            except:
+                print('no book cover available')
 
 
 
@@ -409,14 +435,14 @@ if __name__ == '__main__':
     bot.search()
     bot.click_search_button()
     bot.close_login_popup()
-   # bot.click_more_author()
+    #bot.click_more_author()
     #bot.find_author_details()
-    bot.finding_containers()
-    bot.list_books_urls()
-    bot.list_urls_other
+    #bot.finding_containers()
+    #bot.list_books_urls()
+    bot.list_urls_other()
     bot.next_page()
     bot.books_info()
-    bot.click_more_book()
+    #bot.click_more_book()
     bot.save_injson()
     bot.download_images()
 
