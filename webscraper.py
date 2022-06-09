@@ -423,6 +423,8 @@ class scraper():
             except:
                 print('no book cover available')
 
+    
+
 
 
 
