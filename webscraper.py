@@ -39,7 +39,7 @@ class scraper():
     """
 
 
-    def __init__(self,book, url: str='https://www.goodreads.com/'):
+    def __init__(self,book: str, url:str):
         self.book = book 
         self.driver = Chrome()
         self.driver.get(url)
@@ -74,7 +74,7 @@ class scraper():
         """
         try:
             WebDriverWait(self.driver,10).until(EC.presence_of_element_located((By.XPATH,xpath)))
-            self.driver.find_element(By.XPATH,xpath).send_keys(input())
+            self.driver.find_element(By.XPATH,xpath).send_keys(self.book)
 
         except TimeoutException:
             print("couldn't type the word in")
@@ -233,6 +233,8 @@ class scraper():
 
         print(f'total number of books url found are {l}')
 
+        return list_urls
+
         
         
             #if n==20:
@@ -379,7 +381,7 @@ class scraper():
         """
         This function used to create a json file in a new folder 
         and add the informations found in the previous function.
-        
+        n
         """
 
         folder = r'raw_data'
@@ -432,7 +434,7 @@ class scraper():
             
 
 if __name__ == '__main__':
-    bot = scraper('Colleen Hoover')
+    bot = scraper('Colleen Hoover','https://www.goodreads.com/')
     bot.click_search_bar()
     bot.search()
     bot.click_search_button()
@@ -455,3 +457,11 @@ if __name__ == '__main__':
 # %%
 
 'div[@class = "authorName_container"]'
+'''
+
+git branch -m main master
+git fetch origin
+git branch -u origin/master master
+git remote set-head origin -a
+
+'''
