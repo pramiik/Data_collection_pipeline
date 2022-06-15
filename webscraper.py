@@ -21,6 +21,13 @@ import json
 import urllib.request
 
 
+#from selenium import webdriver
+#from selenium.webdriver.chrome.service import Service
+#from webdriver_manager.chrome import ChromeDriverManager
+
+#driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+
+
 
 
 
@@ -200,6 +207,7 @@ class scraper():
         global l
 
         global info_dict
+        
         info_dict = {
             'author details' :[],
             'urls' :[],
@@ -334,8 +342,11 @@ class scraper():
                 self.click_more_book()
                 book_description = self.driver.find_element(By.XPATH, '//*[@id="descriptionContainer"]')
                 info_dict['book description'].append(book_description.text)
+                
             except:
                 print('no book description available!')
+                book_description = 'no book description available'
+                info_dict['book description'].append(book_description)
             
 
 
@@ -344,7 +355,8 @@ class scraper():
                 imag_dic = image.find_element(By.TAG_NAME, 'img').get_attribute('src')
             except:
                 print('no book cover found for this book')
-                imag_dic = 'no book cover'
+                imag_dic = 'https://leadershiftinsights.com/wp-content/uploads/2019/07/no-book-cover-available-300x300.jpg'
+            
             info_dict['book_cover_links'].append(imag_dic)
 
             
