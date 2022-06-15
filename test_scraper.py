@@ -43,7 +43,7 @@ class scraperTestCase(unittest.TestCase):
         self.bot.search()
         self.bot.click_search_button()
         self.bot.close_login_popup()
-        actual= self.bot.driver.current_url.text
+        actual= self.bot.driver.current_url()
         self.assertEqual(expected, actual)
 
     def test_finding_container(self):
@@ -53,7 +53,7 @@ class scraperTestCase(unittest.TestCase):
         self.assertIsNotNone(self.bot.finding_containers)
 
     def test_list_books_urls(self):
-        #expected = type(list)
+        expected = list
         self.bot.click_search_bar()
         self.bot.search()
         self.bot.click_search_button()
@@ -61,15 +61,18 @@ class scraperTestCase(unittest.TestCase):
         self.bot.list_urls_other()
         self.bot.list_books_urls()
         actual = type(self.bot.list_books_urls())
-        self.assertListEqual(actual)
+        self.assertIs(actual,expected)
+        #assertIs
 
     def test_save_json(self):
         self.bot.click_search_bar()
         self.bot.search()
         self.bot.click_search_button()
+        #self.bot.close_login_popup()
         self.bot.finding_containers()
         self.bot.list_urls_other()
         self.bot.list_books_urls()
+        #self.bot.books_info()
         self.bot.save_injson()
         self.assertTrue(os.path.exists('/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.json'))
 
