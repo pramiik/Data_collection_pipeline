@@ -13,11 +13,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+
+import pandas as pd
+
 import re
 import uuid
 from uuid import UUID
 import os
 import json
+import boto3
 import urllib.request
 
 
@@ -278,7 +282,7 @@ class scraper():
         period=0
 
         list_urls =[]
-        while period<7:
+        while period<9:
             
             self.finding_containers()
             self.list_books_urls()
@@ -374,6 +378,8 @@ class scraper():
 
             #return info_dict
 
+        
+
         #print(info_dict)
 
 
@@ -402,6 +408,11 @@ class scraper():
 
         with open("/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.json", "w+") as f:
             json.dump(info_dict, f)
+
+        s3_client = boto3.client('s3')
+        response = s3_client.upload_file('/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.json', 'wsaicorebucket', 'data.json')
+
+
 
 
 
@@ -434,19 +445,41 @@ class scraper():
             try:
                 self.driver.get(lst)
                 urllib.request.urlretrieve(lst,f'/home/pramika/Documents/Aicore/data_collection_project/raw_data/images/{bot.book}{i}.jpg')
+
+                s3_client = boto3.client('s3')
+                response = s3_client.upload_file(f'/home/pramika/Documents/Aicore/data_collection_project/raw_data/images/{bot.book}{i}.jpg', 'wsaicorebucket', f'{bot.book}{i}.jpg')
+        
+
+
             except:
                 print('no book cover available')
 
+
+    def dta_frm(self):
+        """
+        This function is used to create a dataframe from the information found in the
+        dictionary 'info_dict'.
+        """
+        df = pd.DataFrame.from_dict(info_dict, orient='index')
+        df = df.transpose()
+        #df = pd.DataFrame(info_dict)
+        print(df)
+        #df.to_pickle('/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.pkl')
+        #df.to_csv('/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.csv')
+        df.to_csv('/home/pramika/Documents/Aicore/data_collection_project/raw_data/rawdatac.csv', index=False)
+        df.to_excel('/home/pramika/Documents/Aicore/data_collection_project/raw_data/rawdataex.xls', index=False)
+
+    
     
 
 
-
+#pd.DataFrame.from_dict(data)
 
 
             
 
 if __name__ == '__main__':
-    bot = scraper('Colleen Hoover','https://www.goodreads.com/')
+    bot = scraper('colleen hoover','https://www.goodreads.com/')
     bot.click_search_bar()
     bot.search()
     bot.click_search_button()
@@ -461,6 +494,7 @@ if __name__ == '__main__':
     #bot.click_more_book()
     bot.save_injson()
     bot.download_images()
+    bot.dta_frm()
 
 
 
@@ -468,9 +502,11 @@ if __name__ == '__main__':
 
 # %%
 
+# %%
+
 'div[@class = "authorName_container"]'
 '''
-
+midnight librarymidnight library
 git branch -m main master
 git fetch origin
 git branch -u origin/master master

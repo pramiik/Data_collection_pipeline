@@ -38,12 +38,12 @@ class scraperTestCase(unittest.TestCase):
         
 
     def test_bookurl(self):
-        expected = "https://www.goodreads.com/search?q=colleen+hoover"
+        expected = "https://www.goodreads.com/search?utf8=%E2%9C%93&query=colleen+hoover"
         self.bot.click_search_bar()
         self.bot.search()
         self.bot.click_search_button()
         self.bot.close_login_popup()
-        actual= self.bot.driver.current_url()
+        actual= self.bot.driver.current_url
         self.assertEqual(expected, actual)
 
     def test_finding_container(self):
