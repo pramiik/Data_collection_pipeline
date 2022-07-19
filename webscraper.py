@@ -461,13 +461,13 @@ class scraper():
         dictionary 'info_dict'.
         """
         df = pd.DataFrame.from_dict(info_dict, orient='index')
-        df = df.transpose()
+       # df = df.transpose()
         #df = pd.DataFrame(info_dict)
         print(df)
         #df.to_pickle('/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.pkl')
         #df.to_csv('/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.csv')
         df.to_csv('/home/pramika/Documents/Aicore/data_collection_project/raw_data/rawdatac.csv', index=False)
-        df.to_excel('/home/pramika/Documents/Aicore/data_collection_project/raw_data/rawdataex.xls', index=False)
+        df.to_excel('/home/pramika/Documents/Aicore/data_collection_project/raw_data/rawdataex.txt', index=False)
 
     
     
