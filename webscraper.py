@@ -21,7 +21,7 @@ import uuid
 from uuid import UUID
 import os
 import json
-import boto3
+#import boto3
 import urllib.request
 
 
@@ -466,15 +466,14 @@ class scraper():
         print(df)
         #df.to_pickle('/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.pkl')
         #df.to_csv('/home/pramika/Documents/Aicore/data_collection_project/raw_data/data.csv')
+        #df.to_excel('/home/pramika/Documents/Aicore/data_collection_project/raw_data/rawdataex.xls', index=False)
         df.to_csv('/home/pramika/Documents/Aicore/data_collection_project/raw_data/rawdatac.csv', index=False)
-        df.to_excel('/home/pramika/Documents/Aicore/data_collection_project/raw_data/rawdataex.txt', index=False)
 
     
     
 
 
 #pd.DataFrame.from_dict(data)
-
 
             
 
